@@ -235,8 +235,7 @@ namespace TidalLib
             {
                 case eAudioQuality.Normal: return "LOW";
                 case eAudioQuality.High: return "HIGH";
-                case eAudioQuality.HiFi: return "LOSSLESS";
-                case eAudioQuality.Master: return "HI_RES";
+                case eAudioQuality.MAX: return "LOSSLESS";
             }
             return null;
         }
@@ -484,7 +483,7 @@ namespace TidalLib
         public static string GetLyrics(LoginKey oKey, string title, string artist)
         {
             if (title.IsBlank() || artist.IsBlank())
-                return "";
+                return null;
 
             try
             {
@@ -499,7 +498,7 @@ namespace TidalLib
                     Proxy: oKey.Proxy);
 
                 if (errmsg.IsNotBlank())
-                    return "";
+                    return null;
 
                 JObject jo = JObject.Parse(result.ToString());
                 var songId = jo["response"]["hits"][0]["result"]["id"];
@@ -510,7 +509,7 @@ namespace TidalLib
                     Proxy: oKey.Proxy);
 
                 if (errmsg.IsNotBlank())
-                    return "";
+                    return null;
 
                 jo = JObject.Parse(result2.ToString());
                 var song_url = jo["response"]["song"]["url"].ToString();
@@ -520,7 +519,10 @@ namespace TidalLib
                 request.Timeout = 30000;
                 request.Headers.Set("Pragma", "no-cache");
                 if (oKey.Proxy != null)
-                    request.Proxy = HttpHelper.GetWebProxy(oKey.Proxy);
+                    request.Proxy = new WebProxy(oKey.Proxy.Host, oKey.Proxy.Port) { 
+                        Credentials = !string.IsNullOrEmpty(oKey.Proxy.Username) ? 
+                            new NetworkCredential(oKey.Proxy.Username, oKey.Proxy.Password) : null 
+                    };
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 Stream streamReceive = response.GetResponseStream();
                 //Encoding encoding = Encoding.GetEncoding("GB2312");
@@ -546,7 +548,7 @@ namespace TidalLib
                 }
 
                 if (text.IsBlank())
-                    return "";
+                    return null;
 
                 text = text.Replace("<br>", "\n").Replace("&#x27;", "'");
                 text = System.Text.RegularExpressions.Regex.Replace(text, @"(\[.*?\])*", "");
@@ -895,5 +897,3 @@ namespace TidalLib
     //    }
     //}
 }
-
-

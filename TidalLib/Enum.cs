@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,8 +10,7 @@ namespace TidalLib
     {
         Normal,
         High,
-        HiFi,
-        Master,
+        MAX
     }
 
     public enum eVideoQuality
